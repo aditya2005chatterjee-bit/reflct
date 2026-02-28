@@ -58,6 +58,16 @@ export interface LoggedPurchase {
   startDate: string; // ISO string
 }
 
+export interface MonthlyGoal {
+  id: string;
+  name: string;
+  targetAmount: number;
+  durationMonths: number;
+  monthsCompleted: number;
+  collectedAmount: number;
+  startDate: string; // ISO string
+}
+
 export type ImpactSeverity = "none" | "minor" | "moderate" | "major";
 
 export function getImpactSeverity(impact: PurchaseImpact): ImpactSeverity {
