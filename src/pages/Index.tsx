@@ -108,6 +108,7 @@ const Index = () => {
   const [expectedReturn, setExpectedReturn] = useState(8);
   const [goalTracker, setGoalTracker] = useState<Record<string, boolean>>({});
   const [monthlyGoals, setMonthlyGoals] = useState<MonthlyGoal[]>([]);
+  const [activeMonthlyIndex, setActiveMonthlyIndex] = useState(0);
   const [goalMode, setGoalMode] = useState<"yearly" | "monthly">("yearly");
   const [newMonthlyName, setNewMonthlyName] = useState("");
   const [newMonthlyTarget, setNewMonthlyTarget] = useState(0);
@@ -385,7 +386,7 @@ while (true) {
 
   {/* Dynamic Greeting */}
   <h2 className="text-2xl font-semibold tracking-tight w-full text-left">
-    Hey
+    Hey Guest
   </h2>
 
   {/* Top Cards Row */}
@@ -532,29 +533,85 @@ while (true) {
     </div>
   )}
 
-  {/* Goal Wealth Preview */}
-  <div className="w-full max-w-sm flex justify-center mt-10">
-    <div className="relative w-32 h-32 flex items-center justify-center">
+  {/* Goal Wealth + Monthly Preview */}
+  <div className="w-full max-w-sm flex items-center justify-between mt-10 gap-6">
 
-      {/* Outer Ring (Thicker + Glow) */}
+    {/* Monthly Goals Swipe */}
+    <div
+      className="flex-1 flex justify-center cursor-pointer"
+      onClick={() => {
+        if (monthlyGoals.length <= 1) return;
+        setActiveMonthlyIndex((prev) => (prev + 1) % monthlyGoals.length);
+      }}
+    >
+      {monthlyGoals.length === 0 ? (
+        <div className="text-xs text-muted-foreground whitespace-nowrap">
+          Create a monthly goal →
+        </div>
+      ) : (
+        (() => {
+          const goal = monthlyGoals[activeMonthlyIndex];
+          const progress = Math.min(
+            100,
+            (goal.collectedAmount / goal.targetAmount) * 100
+          );
+
+          return (
+            <div className="flex flex-col items-center">
+              <div className="relative w-32 h-32">
+                <div
+                  className="absolute inset-0 rounded-full"
+                  style={{
+                    background: `conic-gradient(#3b82f6 ${progress}%, rgba(255,255,255,0.08) ${progress}%)`
+                  }}
+                />
+                <div className="absolute inset-[14px] bg-background rounded-full flex flex-col items-center justify-center text-center">
+                  <span className="text-3xl font-semibold tracking-tight">
+                    {progress.toFixed(0)}%
+                  </span>
+                  <span className="text-[10px] text-muted-foreground leading-tight">
+                    {goal.name}
+                  </span>
+                </div>
+              </div>
+
+              <div className="flex gap-1 mt-2">
+                {monthlyGoals.map((_, i) => (
+                  <div
+                    key={i}
+                    className={`h-1.5 w-1.5 rounded-full ${
+                      i === activeMonthlyIndex ? "bg-foreground" : "bg-muted"
+                    }`}
+                  />
+                ))}
+              </div>
+            </div>
+          );
+        })()
+      )}
+    </div>
+
+    {/* Yearly Ring (shifted right) */}
+    <div className="relative w-32 h-32 flex-shrink-0">
+
       <div
-        className="absolute w-32 h-32 rounded-full shadow-[0_0_30px_rgba(59,130,246,0.22)]"
+        className="absolute inset-0 rounded-full shadow-[0_0_30px_rgba(59,130,246,0.22)]"
         style={{
           background: `conic-gradient(#3b82f6 ${goalProgressPercent}%, rgba(255,255,255,0.08) ${goalProgressPercent}%)`,
         }}
       />
 
-      {/* Inner Cutout */}
-      <div className="absolute w-[6.5rem] h-[6.5rem] bg-background rounded-full flex flex-col items-center justify-center text-center">
+      <div className="absolute inset-[14px] bg-background rounded-full flex flex-col items-center justify-center text-center">
         <span className="text-3xl font-semibold tracking-tight">
           {goalProgressPercent.toFixed(0)}%
         </span>
         <span className="text-[10px] text-muted-foreground leading-tight">
-          Goal Completion
+          Long Term Goal
         </span>
       </div>
 
     </div>
+
   </div>
 </div>
 ) : activeTab === "simulate" ? (
