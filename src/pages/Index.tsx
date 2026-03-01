@@ -595,7 +595,7 @@ while (true) {
     <div className="relative w-32 h-32 flex-shrink-0">
 
       <div
-        className="absolute inset-0 rounded-full shadow-[0_0_30px_rgba(59,130,246,0.22)]"
+        className="absolute inset-0 rounded-full"
         style={{
           background: `conic-gradient(#3b82f6 ${goalProgressPercent}%, rgba(255,255,255,0.08) ${goalProgressPercent}%)`,
         }}
@@ -720,7 +720,7 @@ while (true) {
                         {/* Outer Wealth Ring */}
                         <div
                           title={`Wealth Progress: ${projectedGoalPercent.toFixed(0)}% of target amount`}
-                          className="absolute w-32 h-32 rounded-full transition-all duration-300 group-hover:shadow-[0_0_25px_rgba(59,130,246,0.35)]"
+                          className="absolute w-32 h-32 rounded-full"
                           style={{
                             background: `conic-gradient(${projectedGoalPercent >= 100 ? "#22c55e" : "#3b82f6"} ${projectedGoalPercent}%, rgba(255,255,255,0.08) ${projectedGoalPercent}%)`
                           }}
@@ -729,7 +729,7 @@ while (true) {
                         {/* Inner Readiness Ring */}
                         <div
                           title={`Savings Readiness: ${savingsReadinessPercent.toFixed(0)}% of required monthly investment`}
-                          className="absolute w-24 h-24 rounded-full transition-all duration-300 group-hover:shadow-[0_0_20px_rgba(249,115,22,0.35)]"
+                          className="absolute w-24 h-24 rounded-full"
                           style={{
                             background: `conic-gradient(${savingsReadinessPercent >= 100 ? "#22c55e" : "#f97316"} ${savingsReadinessPercent}%, rgba(255,255,255,0.06) ${savingsReadinessPercent}%)`
                           }}
