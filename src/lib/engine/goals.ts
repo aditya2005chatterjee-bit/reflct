@@ -14,7 +14,6 @@ export interface GoalProjection {
     expectedReturn: number,
     currentSaved: number
   ): GoalProjection {
-    {
       const monthlySaving = monthlyIncome - monthlyExpenses;
       const monthlyRate = expectedReturn / 100 / 12;
       const totalMonths = goalYears * 12;
@@ -75,5 +74,4 @@ export interface GoalProjection {
         projectedFutureValue,
         savingsReadinessPercent,
       };
-    }
   }
