@@ -152,7 +152,8 @@ const Index = () => {
         baseline.monthlyExpenses,
         goalAmount,
         goalYears,
-        expectedReturn
+        expectedReturn,
+        0
       ),
     [
       monthlyIncome,
