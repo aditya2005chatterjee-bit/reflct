@@ -68,38 +68,8 @@ const Index = () => {
   const [currentSavings, setCurrentSavings] = useState(0);
   const [activeTab, setActiveTab] = useState<"baseline" | "simulate" | "goal">("baseline");
   const [direction, setDirection] = useState<"left" | "right">("right");
-  // Tabs and swipe state for mobile
+  // Tabs for navigation
   const tabs: ("baseline" | "simulate" | "goal")[] = ["baseline", "simulate", "goal"];
-  const [touchStart, setTouchStart] = useState<number | null>(null);
-  const [touchEnd, setTouchEnd] = useState<number | null>(null);
-
-  const handleTouchStart = (e: React.TouchEvent) => {
-    setTouchStart(e.targetTouches[0].clientX);
-  };
-
-  const handleTouchMove = (e: React.TouchEvent) => {
-    setTouchEnd(e.targetTouches[0].clientX);
-  };
-
-  const handleTouchEnd = () => {
-    if (touchStart === null || touchEnd === null) return;
-
-    const distance = touchStart - touchEnd;
-    const minSwipeDistance = 50;
-
-    const currentIndex = tabs.indexOf(activeTab);
-
-    if (distance > minSwipeDistance && currentIndex < tabs.length - 1) {
-      setActiveTab(tabs[currentIndex + 1]);
-    }
-
-    if (distance < -minSwipeDistance && currentIndex > 0) {
-      setActiveTab(tabs[currentIndex - 1]);
-    }
-
-    setTouchStart(null);
-    setTouchEnd(null);
-  };
 
   const [purchases, setPurchases] = useState<LoggedPurchase[]>([]);
 
@@ -372,9 +342,6 @@ while (true) {
       {/* Content */}
       <main
         className="container max-w-lg mx-auto px-4 py-6 pb-20"
-        onTouchStart={handleTouchStart}
-        onTouchMove={handleTouchMove}
-        onTouchEnd={handleTouchEnd}
       >
         <div
           key={activeTab}
