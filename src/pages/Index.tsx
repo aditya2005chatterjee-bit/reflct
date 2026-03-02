@@ -288,7 +288,7 @@ while (true) {
   return (
     <div className="min-h-screen bg-background transition-all duration-500 ease-in-out">
       {/* Header */}
-      <header className="sticky top-0 z-50 bg-background/70 backdrop-blur-xl border-b border-border/40">
+      <header className="sticky top-0 z-50 bg-background/70 backdrop-blur-xl shadow-sm">
         <div className="container max-w-lg mx-auto px-4 py-4">
           <div className="relative flex items-center justify-center">
             <h1 className="text-2xl font-semibold tracking-tight text-center w-full">
@@ -361,7 +361,7 @@ while (true) {
   <div className="flex items-center justify-between w-full max-w-sm gap-4">
 
     {/* Stability Card */}
-    <div className="flex-1 rounded-2xl bg-card/70 backdrop-blur-xl border border-white/10 p-4 text-center shadow-lg hover:-translate-y-1 transition-all duration-300">
+    <div className="flex-1 rounded-2xl bg-card/70 backdrop-blur-xl p-4 text-center shadow-md hover:-translate-y-1 transition-all duration-300">
       <p className="text-xs font-medium text-muted-foreground mb-1">
         Stability
       </p>
@@ -383,7 +383,7 @@ while (true) {
     </div>
 
     {/* Purchases + EMI Card */}
-    <div className="flex-1 rounded-2xl bg-card/70 backdrop-blur-xl border border-white/10 p-4 text-center shadow-lg hover:-translate-y-1 transition-all duration-300">
+    <div className="flex-1 rounded-2xl bg-card/70 backdrop-blur-xl p-4 text-center shadow-md hover:-translate-y-1 transition-all duration-300">
       <p className="text-xs font-medium text-muted-foreground mb-1">
         Active EMIs
       </p>
@@ -401,7 +401,7 @@ while (true) {
   </div>
 
   {/* This Month Overview */}
-  <div className="w-full max-w-sm rounded-2xl bg-card/70 backdrop-blur-xl border border-white/10 p-5 space-y-3 shadow-lg hover:-translate-y-1 transition-all duration-300">
+  <div className="w-full max-w-sm rounded-2xl bg-card/70 backdrop-blur-xl p-5 space-y-3 shadow-md hover:-translate-y-1 transition-all duration-300">
     <p className="text-xs uppercase tracking-wider text-muted-foreground">
       This Month
     </p>
@@ -530,7 +530,15 @@ while (true) {
                 <div
                   className="absolute inset-0 rounded-full"
                   style={{
-                    background: `conic-gradient(#3b82f6 ${progress}%, rgba(255,255,255,0.08) ${progress}%)`
+                    background: `conic-gradient(${
+                      progress >= 80
+                        ? "#22c55e"
+                        : progress >= 50
+                        ? "#3b82f6"
+                        : progress >= 25
+                        ? "#f97316"
+                        : "#ef4444"
+                    } ${progress}%, rgba(255,255,255,0.08) ${progress}%)`
                   }}
                 />
                 <div className="absolute inset-[14px] bg-background rounded-full flex flex-col items-center justify-center text-center">
@@ -565,7 +573,15 @@ while (true) {
       <div
         className="absolute inset-0 rounded-full"
         style={{
-          background: `conic-gradient(#3b82f6 ${goalProgressPercent}%, rgba(255,255,255,0.08) ${goalProgressPercent}%)`,
+          background: `conic-gradient(${
+            goalProgressPercent >= 80
+              ? "#22c55e"
+              : goalProgressPercent >= 50
+              ? "#3b82f6"
+              : goalProgressPercent >= 25
+              ? "#f97316"
+              : "#ef4444"
+          } ${goalProgressPercent}%, rgba(255,255,255,0.08) ${goalProgressPercent}%)`,
         }}
       />
 
@@ -690,7 +706,15 @@ while (true) {
                           title={`Wealth Progress: ${projectedGoalPercent.toFixed(0)}% of target amount`}
                           className="absolute w-32 h-32 rounded-full"
                           style={{
-                            background: `conic-gradient(${projectedGoalPercent >= 100 ? "#22c55e" : "#3b82f6"} ${projectedGoalPercent}%, rgba(255,255,255,0.08) ${projectedGoalPercent}%)`
+                            background: `conic-gradient(${
+                              projectedGoalPercent >= 80
+                                ? "#22c55e"
+                                : projectedGoalPercent >= 50
+                                ? "#3b82f6"
+                                : projectedGoalPercent >= 25
+                                ? "#f97316"
+                                : "#ef4444"
+                            } ${projectedGoalPercent}%, rgba(255,255,255,0.08) ${projectedGoalPercent}%)`
                           }}
                         />
 
@@ -895,7 +919,7 @@ while (true) {
             {goalMode === "monthly" && (
               <div className="space-y-8">
 
-                <div className="rounded-2xl bg-card/70 backdrop-blur-xl border border-white/10 p-6 shadow-lg space-y-4">
+                <div className="rounded-2xl bg-card/70 backdrop-blur-xl p-6 shadow-md space-y-4">
                   <h3 className="text-sm font-semibold uppercase tracking-wider">
                     Monthly Goal Setup
                   </h3>
@@ -963,7 +987,15 @@ while (true) {
                           <div
                             className="absolute inset-0 rounded-full"
                             style={{
-                              background: `conic-gradient(#3b82f6 ${progress}%, rgba(255,255,255,0.08) ${progress}%)`
+                              background: `conic-gradient(${
+                                progress >= 80
+                                  ? "#22c55e"
+                                  : progress >= 50
+                                  ? "#3b82f6"
+                                  : progress >= 25
+                                  ? "#f97316"
+                                  : "#ef4444"
+                              } ${progress}%, rgba(255,255,255,0.08) ${progress}%)`
                             }}
                           />
                           <div className="absolute inset-[8px] bg-background rounded-full flex items-center justify-center text-xs font-semibold">
@@ -1010,7 +1042,7 @@ while (true) {
       </main>
       {/* Bottom Minimal Navigation */}
       <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50">
-        <div className="flex items-center gap-8 px-6 py-3 rounded-full bg-background/70 backdrop-blur-xl border border-border/40 shadow-lg">
+        <div className="flex items-center gap-8 px-6 py-3 rounded-full bg-background/70 backdrop-blur-xl shadow-md">
 
           {(["baseline", "simulate", "goal"] as const).map((tab) => (
             <button
