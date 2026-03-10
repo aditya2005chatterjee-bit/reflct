@@ -1,51 +1,13 @@
 import { useState, useMemo, useEffect } from "react";
-import CurrencyInput from "@/components/CurrencyInput";
 import DecisionTab from "@/features/simulate/DecisionTab";
-import { calculateStability, formatCurrency, FinancialSnapshot, LoggedPurchase, MonthlyGoal } from "@/lib/financial";
+import { calculateStability, formatCurrency, LoggedPurchase, MonthlyGoal } from "@/lib/financial";
 import { computeBaseline } from "@/lib/engine/baseline";
 import { computeGoalProjection } from "@/lib/engine/goals";
 import BaselineTab from "@/features/baseline/BaselineTab";
 import GoalsTab from "@/features/goals/GoalsTab";
 
-// ---- Local Storage Layer ----
-const storage = {
-  getBaseline() {
-    const raw = localStorage.getItem("baseline_v1");
-    return raw ? JSON.parse(raw) : null;
-  },
-  setBaseline(data: any) {
-    localStorage.setItem("baseline_v1", JSON.stringify(data));
-  },
-  getPurchases() {
-    const raw = localStorage.getItem("purchaseHistory_v1");
-    return raw ? JSON.parse(raw) : [];
-  },
-  setPurchases(data: any) {
-    localStorage.setItem("purchaseHistory_v1", JSON.stringify(data));
-  },
-  getGoalTracker() {
-    const raw = localStorage.getItem("goal_tracker_v1");
-    return raw ? JSON.parse(raw) : {};
-  },
-  setGoalTracker(data: any) {
-    localStorage.setItem("goal_tracker_v1", JSON.stringify(data));
-  },
-  getGoalConfig() {
-    const raw = localStorage.getItem("goal_config_v1");
-    return raw ? JSON.parse(raw) : null;
-  },
-  setGoalConfig(data: any) {
-    localStorage.setItem("goal_config_v1", JSON.stringify(data));
-  },
-  getMonthlyGoals() {
-    const raw = localStorage.getItem("monthly_goals_v1");
-    return raw ? JSON.parse(raw) : [];
-  },
-  setMonthlyGoals(data: any) {
-    localStorage.setItem("monthly_goals_v1", JSON.stringify(data));
-  },
-};
-// ------------------------------
+import { storage } from "@/lib/storage";
+
 
 const Index = () => {
   const [theme, setTheme] = useState<"light" | "dark">(() => {
@@ -82,9 +44,6 @@ const Index = () => {
   const [monthlyGoals, setMonthlyGoals] = useState<MonthlyGoal[]>([]);
   const [activeMonthlyIndex, setActiveMonthlyIndex] = useState(0);
   const [goalMode, setGoalMode] = useState<"yearly" | "monthly">("yearly");
-  const [newMonthlyName, setNewMonthlyName] = useState("");
-  const [newMonthlyTarget, setNewMonthlyTarget] = useState(0);
-  const [newMonthlyDuration, setNewMonthlyDuration] = useState(1);
 
   const baseline = useMemo(
     () =>
@@ -148,11 +107,12 @@ const Index = () => {
     ? Math.min(100, (projectedFutureValue / goalAmount) * 100)
     : 0;
 
-  // ---- Future Wealth Projection (based on savings rate and time) ----
-  const goalProgressPercent = goalAmount > 0
-    ? Math.min(100, (projectedFutureValue / goalAmount) * 100)
-    : 0;
-  // ---------------------------------------------------------
+  // ---- Actual Goal Completion (for Home tab ring) ----
+  const goalProgressPercent =
+    goalAmount > 0
+      ? Math.min(100, (currentSavings / goalAmount) * 100)
+      : 0;
+  // ---------------------------------------------------
 
   const goalStatus =
     projectedYears === 0
@@ -244,44 +204,7 @@ while (true) {
   useEffect(() => {
     storage.setMonthlyGoals(monthlyGoals);
   }, [monthlyGoals]);
-  // --- Monthly Goals helpers ---
-  const addMonthlyGoal = (name: string, targetAmount: number, durationMonths: number) => {
-    const newGoal: MonthlyGoal = {
-      id: Date.now().toString(),
-      name,
-      targetAmount,
-      durationMonths,
-      monthsCompleted: 0,
-      collectedAmount: 0,
-      startDate: new Date().toISOString(),
-    };
 
-    setMonthlyGoals(prev => [...prev, newGoal]);
-  };
-
-  const logMonthlyGoalAmount = (goalId: string, amount: number) => {
-    if (amount <= 0) return;
-
-    setMonthlyGoals(prev =>
-      prev.map(goal => {
-        if (goal.id !== goalId) return goal;
-
-        return {
-          ...goal,
-          collectedAmount: goal.collectedAmount + amount,
-          monthsCompleted: goal.monthsCompleted + 1,
-        };
-      })
-    );
-  };
-
-  const computeRequiredMonthly = (goal: MonthlyGoal) => {
-    const remainingAmount = goal.targetAmount - goal.collectedAmount;
-    const remainingMonths = goal.durationMonths - goal.monthsCompleted;
-
-    if (remainingMonths <= 0) return 0;
-    return remainingAmount / remainingMonths;
-  };
   const [showBaselineForm, setShowBaselineForm] = useState(false);
 
   return (
@@ -393,7 +316,7 @@ while (true) {
   setGoalYears={setGoalYears}
   expectedReturn={expectedReturn}
   setExpectedReturn={setExpectedReturn}
-  goalProgressPercent={goalProgressPercent}
+  goalProgressPercent={projectedGoalPercent}
 
   requiredMonthlyInvestment={requiredMonthlyInvestment}
   projectedYears={projectedYears}
@@ -408,9 +331,6 @@ while (true) {
   currentStreak={currentStreak}
 
   monthlyGoals={monthlyGoals}
-  addMonthlyGoal={addMonthlyGoal}
-  logMonthlyGoalAmount={logMonthlyGoalAmount}
-  computeRequiredMonthly={computeRequiredMonthly}
   setMonthlyGoals={setMonthlyGoals}
 />
 )}

@@ -32,9 +32,6 @@ interface GoalsTabProps {
   currentStreak: number;
 
   monthlyGoals: MonthlyGoal[];
-  addMonthlyGoal: (name: string, targetAmount: number, durationMonths: number) => void;
-  logMonthlyGoalAmount: (goalId: string, amount: number) => void;
-  computeRequiredMonthly: (goal: MonthlyGoal) => number;
   setMonthlyGoals: React.Dispatch<React.SetStateAction<MonthlyGoal[]>>;
 }
 
@@ -50,7 +47,6 @@ const GoalsTab: React.FC<GoalsTabProps> = ({
   goalProgressPercent,
   requiredMonthlyInvestment,
   projectedYears,
-  savingsReadinessPercent,
   goalStatus,
   monthlyIncome,
   baseline,
@@ -58,14 +54,51 @@ const GoalsTab: React.FC<GoalsTabProps> = ({
   setGoalTracker,
   currentStreak,
   monthlyGoals,
-  addMonthlyGoal,
-  logMonthlyGoalAmount,
-  computeRequiredMonthly,
   setMonthlyGoals,
 }) => {
   const [newMonthlyName, setNewMonthlyName] = React.useState("");
   const [newMonthlyTarget, setNewMonthlyTarget] = React.useState(0);
   const [newMonthlyDuration, setNewMonthlyDuration] = React.useState(1);
+
+  // ---- Monthly Goal Logic (moved from Index) ----
+  const addMonthlyGoal = (name: string, targetAmount: number, durationMonths: number) => {
+    const newGoal: MonthlyGoal = {
+      id: Date.now().toString(),
+      name,
+      targetAmount,
+      durationMonths,
+      monthsCompleted: 0,
+      collectedAmount: 0,
+      startDate: new Date().toISOString(),
+    };
+
+    setMonthlyGoals((prev) => [...prev, newGoal]);
+  };
+
+  const logMonthlyGoalAmount = (goalId: string, amount: number) => {
+    if (amount <= 0) return;
+
+    setMonthlyGoals((prev) =>
+      prev.map((goal) => {
+        if (goal.id !== goalId) return goal;
+
+        return {
+          ...goal,
+          collectedAmount: goal.collectedAmount + amount,
+          monthsCompleted: goal.monthsCompleted + 1,
+        };
+      })
+    );
+  };
+
+  const computeRequiredMonthly = (goal: MonthlyGoal) => {
+    const remainingAmount = goal.targetAmount - goal.collectedAmount;
+    const remainingMonths = goal.durationMonths - goal.monthsCompleted;
+
+    if (remainingMonths <= 0) return 0;
+
+    return remainingAmount / remainingMonths;
+  };
 
   const wealthColor =
     goalProgressPercent >= 100
