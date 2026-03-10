@@ -1,4 +1,4 @@
-import { LoggedPurchase } from "@/lib/financial";
+import { LoggedPurchase } from "@/lib/engine/financial";
 
 const BASELINE_STORAGE_KEY = "baseline_v1";
 const PURCHASE_STORAGE_KEY = "purchaseHistory_v1";

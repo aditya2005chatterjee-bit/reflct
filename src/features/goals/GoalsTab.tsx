@@ -1,8 +1,8 @@
 
 import React from "react";
 import CurrencyInput from "@/components/CurrencyInput";
-import { MonthlyGoal } from "@/lib/financial";
-import { formatCurrency } from "@/lib/financial";
+import { MonthlyGoal } from "@/lib/engine/financial";
+import { formatCurrency } from "@/lib/engine/financial";
 
 interface GoalsTabProps {
   goalMode: "yearly" | "monthly";

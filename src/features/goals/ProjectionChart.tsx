@@ -1,5 +1,5 @@
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Area, AreaChart } from "recharts";
-import { formatCurrency } from "@/lib/financial";
+import { formatCurrency } from "@/lib/engine/financial";
 
 interface ProjectionChartProps {
   data: Array<{

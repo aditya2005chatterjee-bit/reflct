@@ -1,6 +1,6 @@
 import React from "react";
 import CurrencyInput from "@/components/CurrencyInput";
-import { formatCurrency, LoggedPurchase, MonthlyGoal } from "@/lib/financial";
+import { formatCurrency, LoggedPurchase, MonthlyGoal } from "@/lib/engine/financial";
 
 interface BaselineTabProps {
   stability: any;

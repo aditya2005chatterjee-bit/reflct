@@ -2,7 +2,7 @@
 
 import React from "react";
 import PurchaseSimulator from "@/components/PurchaseSimulator";
-import { LoggedPurchase } from "@/lib/financial";
+import { LoggedPurchase } from "@/lib/engine/financial";
 
 interface DecisionTabProps {
   baseline: any;

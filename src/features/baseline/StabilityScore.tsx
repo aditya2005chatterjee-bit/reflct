@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { getScoreTailwindColor } from "@/lib/financial";
+import { getScoreTailwindColor } from "@/lib/engine/financial";
 import { useAnimatedNumber } from "@/hooks/useAnimatedNumber";
 
 interface StabilityScoreProps {

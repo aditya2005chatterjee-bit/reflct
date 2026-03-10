@@ -1,4 +1,4 @@
-import { LoggedPurchase } from "@/lib/financial";
+import { LoggedPurchase } from "@/lib/engine/financial";
 
 export interface ComputedBaseline {
   monthlyIncome: number;

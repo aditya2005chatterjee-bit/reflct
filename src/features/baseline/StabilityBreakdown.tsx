@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { ChevronDown } from "lucide-react";
-import { StabilityBreakdown as BreakdownType } from "@/lib/financial";
+import { StabilityBreakdown as BreakdownType } from "@/lib/engine/financial";
 import { useAnimatedNumber } from "@/hooks/useAnimatedNumber";
 
 interface Props {

@@ -1,4 +1,4 @@
-import { ImpactSeverity } from "@/lib/financial";
+import { ImpactSeverity } from "@/lib/engine/financial";
 
 const config: Record<ImpactSeverity, { label: string; className: string }> = {
   none: { label: "No Impact", className: "bg-score-blue/15 text-score-blue border-score-blue/20" },

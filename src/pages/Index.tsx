@@ -1,6 +1,6 @@
 import { useState, useMemo, useEffect } from "react";
 import DecisionTab from "@/features/simulate/DecisionTab";
-import { calculateStability, formatCurrency, LoggedPurchase, MonthlyGoal } from "@/lib/financial";
+import { calculateStability, formatCurrency, LoggedPurchase, MonthlyGoal } from "@/lib/engine/financial";
 import { computeBaseline } from "@/lib/engine/baseline";
 import { computeGoalProjection } from "@/lib/engine/goals";
 import BaselineTab from "@/features/baseline/BaselineTab";

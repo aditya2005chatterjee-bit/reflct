@@ -1,11 +1,11 @@
 import { useState, useMemo } from "react";
-import CurrencyInput from "./CurrencyInput";
-import MetricCard from "./MetricCard";
-import StabilityScore from "./StabilityScore";
-import StabilityBreakdown from "./StabilityBreakdown";
+import CurrencyInput from "../../components/CurrencyInput";
+import MetricCard from "../baseline/MetricCard";
+import StabilityScore from "../baseline/StabilityScore";
+import StabilityBreakdown from "../baseline/StabilityBreakdown";
 import ImpactBadge from "./ImpactBadge";
 import FreedomMeter from "./FreedomMeter";
-import ProjectionChart from "./ProjectionChart";
+import ProjectionChart from "../goals/ProjectionChart";
 import {
   FinancialBaseline,
   calculatePurchaseImpact,
@@ -14,7 +14,7 @@ import {
   formatCurrency,
   getImpactSeverity,
   LoggedPurchase,
-} from "@/lib/financial";
+} from "@/lib/engine/financial";
 
 interface PurchaseSimulatorProps {
   baseline: FinancialBaseline;
