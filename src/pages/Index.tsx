@@ -121,32 +121,6 @@ const Index = () => {
       ? "on-track"
       : "behind";
 
-  // --- Current Streak Calculation ---
-  let currentStreak = 0;
-
-const now = new Date();
-let year = now.getFullYear();
-let month = now.getMonth() + 1;
-
-while (true) {
-  const key = `${year}-${month}`;
-
-  if (goalTracker[key]) {
-    currentStreak++;
-  } else {
-    break;
-  }
-
-  month--;
-
-  if (month === 0) {
-    month = 12;
-    year--;
-  }
-}
-  // --------------------------------
-
-
   useEffect(() => {
     const stored = storage.getPurchases();
     setPurchases(stored);
@@ -328,7 +302,6 @@ while (true) {
 
   goalTracker={goalTracker}
   setGoalTracker={setGoalTracker}
-  currentStreak={currentStreak}
 
   monthlyGoals={monthlyGoals}
   setMonthlyGoals={setMonthlyGoals}

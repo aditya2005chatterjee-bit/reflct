@@ -29,7 +29,6 @@ interface GoalsTabProps {
 
   goalTracker: Record<string, boolean>;
   setGoalTracker: React.Dispatch<React.SetStateAction<Record<string, boolean>>>;
-  currentStreak: number;
 
   monthlyGoals: MonthlyGoal[];
   setMonthlyGoals: React.Dispatch<React.SetStateAction<MonthlyGoal[]>>;
@@ -52,7 +51,6 @@ const GoalsTab: React.FC<GoalsTabProps> = ({
   baseline,
   goalTracker,
   setGoalTracker,
-  currentStreak,
   monthlyGoals,
   setMonthlyGoals,
 }) => {
@@ -99,6 +97,36 @@ const GoalsTab: React.FC<GoalsTabProps> = ({
 
     return remainingAmount / remainingMonths;
   };
+
+  // ---- Saving Streak Logic (moved from Index) ----
+  const calculateStreak = (tracker: Record<string, boolean>) => {
+    let streak = 0;
+
+    const now = new Date();
+    let year = now.getFullYear();
+    let month = now.getMonth() + 1;
+
+    while (true) {
+      const key = `${year}-${month}`;
+
+      if (tracker[key]) {
+        streak++;
+      } else {
+        break;
+      }
+
+      month--;
+
+      if (month === 0) {
+        month = 12;
+        year--;
+      }
+    }
+
+    return streak;
+  };
+
+  const currentStreak = calculateStreak(goalTracker);
 
   const wealthColor =
     goalProgressPercent >= 100
