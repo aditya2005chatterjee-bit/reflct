@@ -1,6 +1,7 @@
 
 import React from "react";
 import CurrencyInput from "@/components/CurrencyInput";
+import ProgressRing from "@/components/ProgressRing";
 import { MonthlyGoal } from "@/lib/engine/financial";
 import { formatCurrency } from "@/lib/engine/financial";
 
@@ -130,12 +131,12 @@ const GoalsTab: React.FC<GoalsTabProps> = ({
 
   const wealthColor =
     goalProgressPercent >= 100
-      ? "#22c55e" // green (completion)
+      ? "#22c55e" // green (goal completed)
       : goalProgressPercent >= 70
-      ? "#3b82f6" // blue
+      ? "#3b82f6" // blue (strong progress)
       : goalProgressPercent >= 40
-      ? "#f97316" // orange
-      : "#ef4444"; // red
+      ? "#f97316" // orange (moderate progress)
+      : "#ef4444"; // red (early stage)
 
   return (
     <div className="space-y-10 animate-fade-in">
@@ -209,19 +210,11 @@ const GoalsTab: React.FC<GoalsTabProps> = ({
           {/* Wealth Progress Ring */}
           <div className="flex justify-center">
             <div className="relative w-32 h-32 flex items-center justify-center">
-              {/* Wealth Progress Ring: single orange ring with grey remainder */}
-              <div
-                className="absolute w-32 h-32 rounded-full"
-                style={{
-                  background: `conic-gradient(
-                    ${wealthColor} ${goalProgressPercent}%,
-                    rgba(255,255,255,0.08) ${goalProgressPercent}%
-                  )`,
-                  WebkitMask:
-                    "radial-gradient(circle 48px at center, transparent 98%, black 100%)",
-                  mask:
-                    "radial-gradient(circle 48px at center, transparent 98%, black 100%)",
-                }}
+              {/* Wealth Progress Ring: use reusable ProgressRing */}
+              <ProgressRing
+                value={goalProgressPercent}
+                size={128}
+                color={wealthColor}
               />
               {/* Center Core */}
               <div className="absolute w-16 h-16 bg-card rounded-full flex flex-col items-center justify-center">
@@ -500,18 +493,14 @@ const GoalsTab: React.FC<GoalsTabProps> = ({
                   </div>
 
                   <div className="relative w-20 h-20 mx-auto">
-
-                    <div
-                      className="absolute inset-0 rounded-full"
-                      style={{
-                        background: `conic-gradient(#3b82f6 ${progress}%, rgba(255,255,255,0.08) ${progress}%)`,
-                      }}
+                    <ProgressRing
+                      value={progress}
+                      size={80}
+                      color="#3b82f6"
                     />
-
                     <div className="absolute inset-[8px] bg-background rounded-full flex items-center justify-center text-xs font-semibold">
                       {progress.toFixed(0)}%
                     </div>
-
                   </div>
 
                   <p className="text-sm text-center text-muted-foreground">

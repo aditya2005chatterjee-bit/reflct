@@ -1,6 +1,7 @@
 import React from "react";
 import CurrencyInput from "@/components/CurrencyInput";
 import { formatCurrency, LoggedPurchase, MonthlyGoal } from "@/lib/engine/financial";
+import ProgressRing from "@/components/ProgressRing";
 
 interface BaselineTabProps {
   stability: any;
@@ -208,12 +209,7 @@ const BaselineTab: React.FC<BaselineTabProps> = ({
               return (
                 <div className="flex flex-col items-center">
                   <div className="relative w-32 h-32">
-                    <div
-                      className="absolute inset-0 rounded-full"
-                      style={{
-                        background: `conic-gradient(${ringColor} ${progress}%, rgba(255,255,255,0.08) ${progress}%)`,
-                      }}
-                    />
+                    <ProgressRing value={progress} size={128} color={ringColor} />
                     <div className="absolute inset-[14px] bg-background rounded-full flex flex-col items-center justify-center text-center">
                       <span className="text-3xl font-semibold tracking-tight">
                         {progress.toFixed(0)}%
@@ -242,16 +238,18 @@ const BaselineTab: React.FC<BaselineTabProps> = ({
 
         {/* Long Term Goal Ring */}
         <div className="relative w-32 h-32 flex-shrink-0">
-          <div
-            className="absolute inset-0 rounded-full"
-            style={{
-              background: `conic-gradient(${
-                goalProgressPercent >= 100 ? "#22c55e" :
-                goalProgressPercent >= 70 ? "#3b82f6" :
-                goalProgressPercent >= 40 ? "#f97316" :
-                "#ef4444"
-              } ${goalProgressPercent}%, rgba(255,255,255,0.08) ${goalProgressPercent}%)`,
-            }}
+          <ProgressRing
+            value={goalProgressPercent}
+            size={128}
+            color={
+              goalProgressPercent >= 100
+                ? "#22c55e"
+                : goalProgressPercent >= 70
+                ? "#3b82f6"
+                : goalProgressPercent >= 40
+                ? "#f97316"
+                : "#ef4444"
+            }
           />
 
           <div className="absolute inset-[14px] bg-background rounded-full flex flex-col items-center justify-center text-center">

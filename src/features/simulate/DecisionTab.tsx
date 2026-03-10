@@ -1,8 +1,8 @@
 
 
 import React from "react";
-import PurchaseSimulator from "@/components/PurchaseSimulator";
-import { LoggedPurchase } from "@/lib/engine/financial";
+import PurchaseSimulator from "./PurchaseSimulator";
+import type { LoggedPurchase } from "@/lib/engine/financial";
 
 interface DecisionTabProps {
   baseline: any;
