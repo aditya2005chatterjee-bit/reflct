@@ -1,9 +1,11 @@
 import { useState, useMemo, useEffect } from "react";
 import CurrencyInput from "@/components/CurrencyInput";
-import PurchaseSimulator from "@/components/PurchaseSimulator";
+import DecisionTab from "@/features/simulate/DecisionTab";
 import { calculateStability, formatCurrency, FinancialSnapshot, LoggedPurchase, MonthlyGoal } from "@/lib/financial";
 import { computeBaseline } from "@/lib/engine/baseline";
 import { computeGoalProjection } from "@/lib/engine/goals";
+import BaselineTab from "@/features/baseline/BaselineTab";
+import GoalsTab from "@/features/goals/GoalsTab";
 
 // ---- Local Storage Layer ----
 const storage = {
@@ -146,12 +148,9 @@ const Index = () => {
     ? Math.min(100, (projectedFutureValue / goalAmount) * 100)
     : 0;
 
-  // ---- Goal Funding Logic (Independent of projections) ----
-  const fundedMonths = Object.values(goalTracker).filter(Boolean).length;
-  const totalFundedAmount = fundedMonths * requiredMonthlyInvestment;
-
+  // ---- Future Wealth Projection (based on savings rate and time) ----
   const goalProgressPercent = goalAmount > 0
-    ? Math.min(100, (totalFundedAmount / goalAmount) * 100)
+    ? Math.min(100, (projectedFutureValue / goalAmount) * 100)
     : 0;
   // ---------------------------------------------------------
 
@@ -350,694 +349,71 @@ while (true) {
           }`}
         >
 {activeTab === "baseline" ? (
-<div className="relative flex flex-col items-center px-6 pt-10 pb-20 space-y-10">
-
-  {/* Dynamic Greeting */}
-  <h2 className="text-2xl font-semibold tracking-tight w-full text-left">
-    Hey Guest
-  </h2>
-
-  {/* Top Cards Row */}
-  <div className="flex items-center justify-between w-full max-w-sm gap-4">
-
-    {/* Stability Card */}
-    <div className="flex-1 rounded-2xl bg-card/70 backdrop-blur-xl p-4 text-center shadow-md hover:-translate-y-1 transition-all duration-300">
-      <p className="text-xs font-medium text-muted-foreground mb-1">
-        Stability
-      </p>
-      <p className="text-2xl font-semibold tracking-tight">
-        {stability.stabilityScore}
-      </p>
-      <p className="text-xs font-medium text-muted-foreground mt-1">
-        {stability.emergencyMonths.toFixed(1)} mo safety
-      </p>
-      <p className="text-[10px] mt-1 text-muted-foreground">
-        {stability.stabilityScore >= 85
-          ? "Strong position"
-          : stability.stabilityScore >= 65
-          ? "Stable"
-          : stability.stabilityScore >= 35
-          ? "Fragile"
-          : "Exposed"}
-      </p>
-    </div>
-
-    {/* Purchases + EMI Card */}
-    <div className="flex-1 rounded-2xl bg-card/70 backdrop-blur-xl p-4 text-center shadow-md hover:-translate-y-1 transition-all duration-300">
-      <p className="text-xs font-medium text-muted-foreground mb-1">
-        Active EMIs
-      </p>
-      <p className="text-2xl font-semibold tracking-tight">
-        {totalActiveEMI > 0 ? formatCurrency(totalActiveEMI) : "—"}
-      </p>
-      <p className="text-xs font-medium text-muted-foreground mt-1">
-        {purchases.filter(p => p.isEMI).length} EMI running
-      </p>
-      <p className="text-[10px] mt-1 text-muted-foreground">
-        Total purchases: {purchases.length}
-      </p>
-    </div>
-
-  </div>
-
-  {/* This Month Overview */}
-  <div className="w-full max-w-sm rounded-2xl bg-card/70 backdrop-blur-xl p-5 space-y-3 shadow-md hover:-translate-y-1 transition-all duration-300">
-    <p className="text-xs uppercase tracking-wider text-muted-foreground">
-      This Month
-    </p>
-
-    <div className="flex justify-between text-sm">
-      <span className="text-muted-foreground">
-        Total Expenses
-      </span>
-      <span className="font-medium">
-        {formatCurrency(baseline.monthlyExpenses)}
-      </span>
-    </div>
-
-    <div className="flex justify-between text-sm">
-      <span className="text-muted-foreground">
-        Savings Left
-      </span>
-      <span className={`text-lg font-semibold transition-colors duration-300 ${
-        monthlyIncome - baseline.monthlyExpenses >= 0
-          ? "text-green-500"
-          : "text-red-500"
-      }`}>
-        {formatCurrency(monthlyIncome - baseline.monthlyExpenses)}
-      </span>
-    </div>
-  </div>
-
-  {/* Central Stability Ring */}
-  <div className="relative w-28 h-28">
-    <div
-      className="absolute inset-0 rounded-full"
-      style={{
-        background: `conic-gradient(${
-          stability.stabilityScore <= 35
-            ? "#ef4444"
-            : stability.stabilityScore <= 65
-            ? "#f97316"
-            : stability.stabilityScore <= 85
-            ? "#3b82f6"
-            : "#22c55e"
-        } ${stability.stabilityScore}%, rgba(0,0,0,0.08) ${stability.stabilityScore}%)`
-      }}
-    />
-    <div className="absolute inset-[10px] bg-background rounded-full flex flex-col items-center justify-center">
-      <span className="text-3xl font-semibold tracking-tight">
-        {stability.stabilityScore}
-      </span>
-      <span className="text-[10px] text-muted-foreground">
-        Overall
-      </span>
-    </div>
-  </div>
-
-  {/* Action Buttons */}
-  <button
-    onClick={() => setActiveTab("simulate")}
-    className="w-full max-w-sm py-3 rounded-full bg-foreground text-background text-sm font-medium shadow-md hover:shadow-lg transition-all duration-300 active:scale-95"
-  >
-    Simulate Decision
-  </button>
-
-  <button
-    onClick={() => setActiveTab("goal")}
-    className="w-full max-w-sm py-3 rounded-full border border-border text-sm font-medium hover:bg-muted/40 transition-all duration-300 active:scale-95"
-  >
-    Plan a Goal
-  </button>
-
-  {/* Edit Financial Details Toggle */}
-  <button
-    onClick={() => setShowBaselineForm(!showBaselineForm)}
-    className="w-full max-w-sm text-xs text-muted-foreground mt-4 hover:text-foreground transition-colors duration-200"
-  >
-    {showBaselineForm ? "Hide financial details" : "Edit financial details"}
-  </button>
-
-  {/* Editable Financial Inputs */}
-  {showBaselineForm && (
-    <div className="w-full max-w-sm space-y-4 mt-6 animate-fade-in">
-      <CurrencyInput
-        label="Monthly Income"
-        value={monthlyIncome}
-        onChange={setMonthlyIncome}
-      />
-
-      <CurrencyInput
-        label="Monthly Expenses"
-        value={monthlyExpenses}
-        onChange={setMonthlyExpenses}
-      />
-
-      <CurrencyInput
-        label="Current Savings"
-        value={currentSavings}
-        onChange={setCurrentSavings}
-      />
-    </div>
-  )}
-
-  {/* Goal Wealth + Monthly Preview */}
-  <div className="w-full max-w-sm flex items-center justify-between mt-10 gap-6">
-
-    {/* Monthly Goals Swipe */}
-    <div
-      className="flex-1 flex justify-center cursor-pointer"
-      onClick={() => {
-        if (monthlyGoals.length <= 1) return;
-        setActiveMonthlyIndex((prev) => (prev + 1) % monthlyGoals.length);
-      }}
-    >
-      {monthlyGoals.length === 0 ? (
-        <div className="text-xs text-muted-foreground whitespace-nowrap">
-          Create a monthly goal →
-        </div>
-      ) : (
-        (() => {
-          const goal = monthlyGoals[activeMonthlyIndex];
-          const progress = Math.min(
-            100,
-            (goal.collectedAmount / goal.targetAmount) * 100
-          );
-
-          return (
-            <div className="flex flex-col items-center">
-              <div className="relative w-32 h-32">
-                <div
-                  className="absolute inset-0 rounded-full"
-                  style={{
-                    background: `conic-gradient(${
-                      progress >= 80
-                        ? "#22c55e"
-                        : progress >= 50
-                        ? "#3b82f6"
-                        : progress >= 25
-                        ? "#f97316"
-                        : "#ef4444"
-                    } ${progress}%, rgba(255,255,255,0.08) ${progress}%)`
-                  }}
-                />
-                <div className="absolute inset-[14px] bg-background rounded-full flex flex-col items-center justify-center text-center">
-                  <span className="text-3xl font-semibold tracking-tight">
-                    {progress.toFixed(0)}%
-                  </span>
-                  <span className="text-[10px] text-muted-foreground leading-tight">
-                    {goal.name}
-                  </span>
-                </div>
-              </div>
-
-              <div className="flex gap-1 mt-2">
-                {monthlyGoals.map((_, i) => (
-                  <div
-                    key={i}
-                    className={`h-1.5 w-1.5 rounded-full ${
-                      i === activeMonthlyIndex ? "bg-foreground" : "bg-muted"
-                    }`}
-                  />
-                ))}
-              </div>
-            </div>
-          );
-        })()
-      )}
-    </div>
-
-    {/* Yearly Ring (shifted right) */}
-    <div className="relative w-32 h-32 flex-shrink-0">
-
-      <div
-        className="absolute inset-0 rounded-full"
-        style={{
-          background: `conic-gradient(${
-            goalProgressPercent >= 80
-              ? "#22c55e"
-              : goalProgressPercent >= 50
-              ? "#3b82f6"
-              : goalProgressPercent >= 25
-              ? "#f97316"
-              : "#ef4444"
-          } ${goalProgressPercent}%, rgba(255,255,255,0.08) ${goalProgressPercent}%)`,
-        }}
-      />
-
-      <div className="absolute inset-[14px] bg-background rounded-full flex flex-col items-center justify-center text-center">
-        <span className="text-3xl font-semibold tracking-tight">
-          {goalProgressPercent.toFixed(0)}%
-        </span>
-        <span className="text-[10px] text-muted-foreground leading-tight">
-          Long Term Goal
-        </span>
-      </div>
-
-    </div>
-
-  </div>
-</div>
+  <BaselineTab
+    stability={stability}
+    baseline={baseline}
+    monthlyIncome={monthlyIncome}
+    monthlyExpenses={monthlyExpenses}
+    currentSavings={currentSavings}
+    setMonthlyIncome={setMonthlyIncome}
+    setMonthlyExpenses={setMonthlyExpenses}
+    setCurrentSavings={setCurrentSavings}
+    purchases={purchases}
+    totalActiveEMI={totalActiveEMI}
+    monthlyGoals={monthlyGoals}
+    activeMonthlyIndex={activeMonthlyIndex}
+    setActiveMonthlyIndex={setActiveMonthlyIndex}
+    goalProgressPercent={goalProgressPercent}
+    showBaselineForm={showBaselineForm}
+    setShowBaselineForm={setShowBaselineForm}
+    setActiveTab={setActiveTab}
+  />
 ) : activeTab === "simulate" ? (
-  <div className="space-y-10 animate-fade-in">
-    {/* Simulation Header */}
-    <div className="space-y-3 mb-4">
-      <h2 className="text-2xl font-semibold tracking-tight text-foreground">
-        Decision Lab
-      </h2>
-      <p className="text-sm text-muted-foreground">
-        Test the financial impact before you commit.
-      </p>
-    </div>
-    <div className="space-y-8">
-      <PurchaseSimulator
-        baseline={baseline}
-        purchases={purchases}
-        onLogPurchase={(purchase) => {
-          const newPurchase: LoggedPurchase = {
-            ...purchase,
-            id: crypto.randomUUID(),
-          };
-
-          const updated = [newPurchase, ...purchases];
-          setPurchases(updated);
-          storage.setPurchases(updated);
-        }}
-        onDeletePurchase={(id) => {
-          const updated = purchases.filter((p) => p.id !== id);
-          setPurchases(updated);
-          storage.setPurchases(updated);
-        }}
-      />
-    </div>
-  </div>
+  <DecisionTab
+    baseline={baseline}
+    purchases={purchases}
+    onLogPurchase={(purchase) => {
+      const updated = [purchase, ...purchases];
+      setPurchases(updated);
+      storage.setPurchases(updated);
+    }}
+    onDeletePurchase={(id) => {
+      const updated = purchases.filter((p) => p.id !== id);
+      setPurchases(updated);
+      storage.setPurchases(updated);
+    }}
+  />
         ) : (
-          <div className="space-y-10 animate-fade-in">
-            {/* Mode Toggle */}
-            <div className="flex justify-center mb-4">
-              <div className="flex rounded-full border border-border overflow-hidden">
-                <button
-                  onClick={() => setGoalMode("yearly")}
-                  className={`px-4 py-1 text-sm ${
-                    goalMode === "yearly"
-                      ? "bg-foreground text-background"
-                      : "text-muted-foreground"
-                  }`}
-                >
-                  Yearly
-                </button>
-                <button
-                  onClick={() => setGoalMode("monthly")}
-                  className={`px-4 py-1 text-sm ${
-                    goalMode === "monthly"
-                      ? "bg-foreground text-background"
-                      : "text-muted-foreground"
-                  }`}
-                >
-                  Monthly
-                </button>
-              </div>
-            </div>
+  <GoalsTab
+  goalMode={goalMode}
+  setGoalMode={setGoalMode}
+  goalAmount={goalAmount}
+  setGoalAmount={setGoalAmount}
+  goalYears={goalYears}
+  setGoalYears={setGoalYears}
+  expectedReturn={expectedReturn}
+  setExpectedReturn={setExpectedReturn}
+  goalProgressPercent={goalProgressPercent}
 
-            {goalMode === "yearly" && (
-              <>
-                <div className="rounded-2xl bg-card/70 backdrop-blur-xl border border-white/10 p-6 shadow-lg hover:-translate-y-1 transition-all duration-300">
-                  <h2 className="text-sm font-semibold text-foreground mb-4 uppercase tracking-wider">
-                    Goal Planning
-                  </h2>
+  requiredMonthlyInvestment={requiredMonthlyInvestment}
+  projectedYears={projectedYears}
+  savingsReadinessPercent={savingsReadinessPercent}
+  goalStatus={goalStatus}
 
-                  <div className="space-y-4">
-                    <CurrencyInput
-                      label="Target Amount"
-                      value={goalAmount}
-                      onChange={setGoalAmount}
-                    />
+  monthlyIncome={monthlyIncome}
+  baseline={baseline}
 
-                    <div>
-                      <label className="text-xs text-muted-foreground">Target Years</label>
-                      <input
-                        type="number"
-                        value={goalYears}
-                        onChange={(e) => setGoalYears(Number(e.target.value))}
-                        className="w-full mt-1 p-2 rounded-md bg-background border border-border text-sm"
-                      />
-                    </div>
+  goalTracker={goalTracker}
+  setGoalTracker={setGoalTracker}
+  currentStreak={currentStreak}
 
-                    <div>
-                      <label className="text-xs text-muted-foreground">Expected Annual Return (%)</label>
-                      <input
-                        type="number"
-                        value={expectedReturn}
-                        onChange={(e) => setExpectedReturn(Number(e.target.value))}
-                        className="w-full mt-1 p-2 rounded-md bg-background border border-border text-sm"
-                      />
-                    </div>
-                  </div>
-                </div>
-
-                {goalAmount > 0 && (monthlyIncome - baseline.monthlyExpenses) > 0 && (
-                  <div className="space-y-8">
-                    {/* Dual ring stays full width at the top */}
-                    <div className="flex justify-center mb-6">
-                      <div className="relative w-32 h-32 flex items-center justify-center group">
-
-                        {/* Outer Wealth Ring */}
-                        <div
-                          title={`Wealth Progress: ${projectedGoalPercent.toFixed(0)}% of target amount`}
-                          className="absolute w-32 h-32 rounded-full"
-                          style={{
-                            background: `conic-gradient(${
-                              projectedGoalPercent >= 80
-                                ? "#22c55e"
-                                : projectedGoalPercent >= 50
-                                ? "#3b82f6"
-                                : projectedGoalPercent >= 25
-                                ? "#f97316"
-                                : "#ef4444"
-                            } ${projectedGoalPercent}%, rgba(255,255,255,0.08) ${projectedGoalPercent}%)`
-                          }}
-                        />
-
-                        {/* Inner Readiness Ring */}
-                        <div
-                          title={`Savings Readiness: ${savingsReadinessPercent.toFixed(0)}% of required monthly investment`}
-                          className="absolute w-24 h-24 rounded-full"
-                          style={{
-                            background: `conic-gradient(${savingsReadinessPercent >= 100 ? "#22c55e" : "#f97316"} ${savingsReadinessPercent}%, rgba(255,255,255,0.06) ${savingsReadinessPercent}%)`
-                          }}
-                        />
-
-                        {/* Center Core */}
-                        <div className="absolute w-16 h-16 bg-card rounded-full flex flex-col items-center justify-center">
-                          <span className="text-xl font-semibold tracking-tight">
-                            {projectedGoalPercent.toFixed(0)}%
-                          </span>
-                          <span className="text-[10px] text-muted-foreground">
-                            Wealth
-                          </span>
-                        </div>
-
-                      </div>
-                    </div>
-                    {/* Start grid two columns */}
-                    <div className="grid grid-cols-2 gap-4">
-                      {/* LEFT column: Required + projection + status */}
-                      <div className="rounded-2xl bg-background/60 backdrop-blur-xl border border-border/40 p-4 space-y-3">
-                        <p className="text-sm font-medium text-muted-foreground">
-                          Required monthly investment
-                        </p>
-                        <p className="text-lg font-semibold">
-                          {formatCurrency(Math.max(0, requiredMonthlyInvestment))}
-                        </p>
-
-                        <p className="text-sm font-medium text-muted-foreground mt-4">
-                          With your current saving rate, you will reach your goal in:
-                        </p>
-                        <p className="text-lg font-semibold">
-                          {projectedYears > 0 ? projectedYears.toFixed(1) + " years" : "Insufficient savings"}
-                        </p>
-
-                        {goalStatus && (
-                          <p className={`text-sm mt-2 ${
-                            goalStatus === "on-track" ? "text-green-500 font-semibold" : "text-red-500 font-semibold"
-                          }`}>
-                            {goalStatus === "on-track"
-                              ? "You are on track to achieve your goal."
-                              : "You are behind schedule for this goal."}
-                          </p>
-                        )}
-                      </div>
-                      {/* RIGHT column: Reality Check card */}
-                      {(() => {
-                        const monthlySaving = monthlyIncome - baseline.monthlyExpenses;
-                        const gap = requiredMonthlyInvestment - monthlySaving;
-
-                        const isSurplus = gap < 0;
-                        const isBalanced = Math.abs(gap) < 100;
-
-                        return (
-                          <div className="rounded-2xl bg-background/60 backdrop-blur-xl border border-border/40 p-4 space-y-3">
-                            <p className="text-xs uppercase tracking-wider text-muted-foreground">
-                              Reality Check
-                            </p>
-
-                            <p
-                              className={`text-sm font-medium ${
-                                isBalanced
-                                  ? "text-blue-500"
-                                  : isSurplus
-                                  ? "text-green-500"
-                                  : "text-red-500"
-                              }`}
-                            >
-                              {isBalanced
-                                ? "You are exactly on track for this goal."
-                                : isSurplus
-                                ? `You have ${formatCurrency(Math.abs(gap))} extra per month beyond what this goal requires.`
-                                : `You are short by ${formatCurrency(gap)} per month to reach this goal on time.`}
-                            </p>
-
-                            {/* Visual Bar */}
-                            <div className="h-2 w-full bg-muted rounded-full overflow-hidden">
-                              <div
-                                className={`h-full transition-all duration-500 ${
-                                  isBalanced
-                                    ? "bg-blue-500"
-                                    : isSurplus
-                                    ? "bg-green-500"
-                                    : "bg-red-500"
-                                }`}
-                                style={{
-                                  width: `${Math.min(
-                                    100,
-                                    Math.max(
-                                      0,
-                                      (monthlySaving / requiredMonthlyInvestment) * 100
-                                    )
-                                  )}%`,
-                                }}
-                              />
-                            </div>
-
-                            <p className="text-[11px] text-muted-foreground">
-                              Monthly capacity vs required investment
-                            </p>
-                          </div>
-                        );
-                      })()}
-                    </div>
-                    {/* End grid */}
-                    {/* Timeline Suggestion Card */}
-                    {(() => {
-                      const monthlySaving = monthlyIncome - baseline.monthlyExpenses;
-                      const gap = requiredMonthlyInvestment - monthlySaving;
-
-                      let suggestionText = "";
-
-                      if (gap > 0) {
-                        const extraYears = projectedYears - goalYears;
-                        suggestionText = `Extend timeline by ~${Math.max(1, Math.round(extraYears))} year(s) or increase monthly savings.`;
-                      } else if (gap < 0) {
-                        suggestionText = `You could achieve this goal ${Math.max(
-                          1,
-                          Math.round(goalYears - projectedYears)
-                        )} year(s) earlier if consistent.`;
-                      } else {
-                        suggestionText = "Your current timeline is realistic and aligned.";
-                      }
-
-                      return (
-                        <div className="mt-6 rounded-2xl bg-background/60 backdrop-blur-xl border border-border/40 p-4 space-y-2">
-                          <p className="text-xs uppercase tracking-wider text-muted-foreground">
-                            Timeline Suggestion
-                          </p>
-
-                          <p className="text-sm font-medium text-foreground">
-                            {suggestionText}
-                          </p>
-
-                          <div className="flex justify-between text-[11px] text-muted-foreground mt-2">
-                            <span>Target: {goalYears} yr</span>
-                            <span>Projected: {projectedYears > 0 ? projectedYears.toFixed(1) : "—"} yr</span>
-                          </div>
-                        </div>
-                      );
-                    })()}
-
-                    {/* Monthly Streak + Calendar */}
-                    {(() => {
-                      const now = new Date();
-                      const currentYear = now.getFullYear();
-
-                      const months = Array.from({ length: 12 }, (_, i) => {
-                        const key = `${currentYear}-${i + 1}`;
-                        return {
-                          key,
-                          label: new Date(currentYear, i).toLocaleString("default", { month: "short" }),
-                          checked: goalTracker[key] || false,
-                        };
-                      });
-
-                      return (
-                        <div className="mt-6 rounded-2xl bg-background/60 backdrop-blur-xl border border-border/40 p-5 space-y-4">
-                          <p className="text-xs uppercase tracking-wider text-muted-foreground">
-                            Saving Streak
-                          </p>
-
-                          <div className="text-lg font-semibold">
-                            🔥 {currentStreak} month{currentStreak === 1 ? "" : "s"}
-                          </div>
-
-                          <div className="grid grid-cols-4 gap-3 mt-4">
-                            {months.map((month) => (
-                              <button
-                                key={month.key}
-                                onClick={() =>
-                                  setGoalTracker({
-                                    ...goalTracker,
-                                    [month.key]: !month.checked,
-                                  })
-                                }
-                                className={`p-2 rounded-lg text-xs font-medium border transition-all duration-200 ${
-                                  month.checked
-                                    ? "bg-green-500/20 border-green-500 text-green-600"
-                                    : "bg-card border-border text-muted-foreground hover:border-foreground/40"
-                                }`}
-                              >
-                                {month.label}
-                              </button>
-                            ))}
-                          </div>
-                        </div>
-                      );
-                    })()}
-                </div>
-                )}
-              </>
-            )}
-
-            {goalMode === "monthly" && (
-              <div className="space-y-8">
-
-                <div className="rounded-2xl bg-card/70 backdrop-blur-xl p-6 shadow-md space-y-4">
-                  <h3 className="text-sm font-semibold uppercase tracking-wider">
-                    Monthly Goal Setup
-                  </h3>
-
-                  <input
-                    type="text"
-                    placeholder="Goal name"
-                    value={newMonthlyName}
-                    onChange={(e) => setNewMonthlyName(e.target.value)}
-                    className="w-full p-2 rounded-md bg-background border border-border text-sm"
-                  />
-
-                  <CurrencyInput
-                    label="Target Amount"
-                    value={newMonthlyTarget}
-                    onChange={setNewMonthlyTarget}
-                  />
-
-                  <div>
-                    <label className="text-xs text-muted-foreground">Duration (months)</label>
-                    <input
-                      type="number"
-                      value={newMonthlyDuration}
-                      onChange={(e) => setNewMonthlyDuration(Number(e.target.value))}
-                      className="w-full mt-1 p-2 rounded-md bg-background border border-border text-sm"
-                    />
-                  </div>
-
-                  <button
-                    onClick={() => {
-                      if (!newMonthlyName || !newMonthlyTarget || !newMonthlyDuration) return;
-                      addMonthlyGoal(newMonthlyName, newMonthlyTarget, newMonthlyDuration);
-                      setNewMonthlyName("");
-                      setNewMonthlyTarget(0);
-                      setNewMonthlyDuration(1);
-                    }}
-                    className="w-full py-2 rounded-full bg-foreground text-background text-sm font-medium"
-                  >
-                    Create Monthly Goal
-                  </button>
-                </div>
-
-                <div className="grid grid-cols-2 gap-4">
-                  {monthlyGoals.map(goal => {
-                    const progress = Math.min(
-                      100,
-                      (goal.collectedAmount / goal.targetAmount) * 100
-                    );
-
-                    const required = computeRequiredMonthly(goal);
-
-                    return (
-                      <div
-                        key={goal.id}
-                        className="bg-background/60 border border-border/40 p-5 space-y-4 aspect-square flex flex-col justify-between"
-                      >
-                        <div className="flex justify-between items-center">
-                          <p className="font-medium">{goal.name}</p>
-                          <p className="text-xs text-muted-foreground">
-                            {goal.monthsCompleted}/{goal.durationMonths} months
-                          </p>
-                        </div>
-
-                        <div className="relative w-20 h-20 mx-auto">
-                          <div
-                            className="absolute inset-0 rounded-full"
-                            style={{
-                              background: `conic-gradient(${
-                                progress >= 80
-                                  ? "#22c55e"
-                                  : progress >= 50
-                                  ? "#3b82f6"
-                                  : progress >= 25
-                                  ? "#f97316"
-                                  : "#ef4444"
-                              } ${progress}%, rgba(255,255,255,0.08) ${progress}%)`
-                            }}
-                          />
-                          <div className="absolute inset-[8px] bg-background rounded-full flex items-center justify-center text-xs font-semibold">
-                            {progress.toFixed(0)}%
-                          </div>
-                        </div>
-
-                        <p className="text-sm text-center text-muted-foreground">
-                          {formatCurrency(goal.collectedAmount)} / {formatCurrency(goal.targetAmount)}
-                        </p>
-
-                        <p className="text-xs text-center text-muted-foreground">
-                          Required this month: {formatCurrency(required)}
-                        </p>
-
-                        <button
-                          onClick={() => {
-                            const amount = Number(prompt("Amount saved this month"));
-                            if (!amount) return;
-                            logMonthlyGoalAmount(goal.id, amount);
-                          }}
-                          className="w-full py-2 rounded-full border border-border text-sm"
-                        >
-                          Log Amount
-                        </button>
-
-                        <button
-                          onClick={() => {
-                            setMonthlyGoals(prev => prev.filter(g => g.id !== goal.id));
-                          }}
-                          className="w-full py-2 rounded-full border border-red-500 text-red-500 text-sm hover:bg-red-500/10 transition"
-                        >
-                          Delete Goal
-                        </button>
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-            )}
-          </div>
-        )}
+  monthlyGoals={monthlyGoals}
+  addMonthlyGoal={addMonthlyGoal}
+  logMonthlyGoalAmount={logMonthlyGoalAmount}
+  computeRequiredMonthly={computeRequiredMonthly}
+  setMonthlyGoals={setMonthlyGoals}
+/>
+)}
         </div>
       </main>
       {/* Bottom Minimal Navigation */}
