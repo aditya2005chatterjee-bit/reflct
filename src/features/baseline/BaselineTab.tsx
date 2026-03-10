@@ -5,6 +5,7 @@ import { formatCurrency, LoggedPurchase, MonthlyGoal } from "@/lib/financial";
 interface BaselineTabProps {
   stability: any;
   baseline: any;
+  userName: string;
 
   monthlyIncome: number;
   monthlyExpenses: number;
@@ -34,6 +35,7 @@ interface BaselineTabProps {
 const BaselineTab: React.FC<BaselineTabProps> = ({
   stability,
   baseline,
+  userName,
   monthlyIncome,
   monthlyExpenses,
   currentSavings,
@@ -50,11 +52,19 @@ const BaselineTab: React.FC<BaselineTabProps> = ({
   setShowBaselineForm,
   setActiveTab,
 }) => {
+  const hour = new Date().getHours();
+  const greeting =
+    hour < 12
+      ? "Good Morning"
+      : hour < 18
+      ? "Good Afternoon"
+      : "Good Evening";
+
   return (
     <div className="relative flex flex-col items-center px-6 pt-10 pb-20 space-y-10">
       {/* Greeting */}
       <h2 className="text-2xl font-semibold tracking-tight w-full text-left">
-        Hey Guest
+        {greeting}, {userName || "Guest"}
       </h2>
 
       {/* Top Cards */}

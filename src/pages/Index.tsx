@@ -5,6 +5,7 @@ import { computeBaseline } from "@/lib/engine/baseline";
 import { computeGoalProjection } from "@/lib/engine/goals";
 import BaselineTab from "@/features/baseline/BaselineTab";
 import GoalsTab from "@/features/goals/GoalsTab";
+import ProfileTab from "@/features/profile/ProfileTab";
 
 import { storage } from "@/lib/storage";
 
@@ -30,10 +31,10 @@ const Index = () => {
   const [monthlyIncome, setMonthlyIncome] = useState(0);
   const [monthlyExpenses, setMonthlyExpenses] = useState(0);
   const [currentSavings, setCurrentSavings] = useState(0);
-  const [activeTab, setActiveTab] = useState<"baseline" | "simulate" | "goal">("baseline");
+  const [activeTab, setActiveTab] = useState<"baseline" | "simulate" | "goal" | "profile">("baseline");
   const [direction, setDirection] = useState<"left" | "right">("right");
   // Tabs for navigation
-  const tabs: ("baseline" | "simulate" | "goal")[] = ["baseline", "simulate", "goal"];
+  const tabs: ("baseline" | "simulate" | "goal" | "profile")[] = ["baseline", "simulate", "goal"];
 
   const [purchases, setPurchases] = useState<LoggedPurchase[]>([]);
 
@@ -44,6 +45,7 @@ const Index = () => {
   const [monthlyGoals, setMonthlyGoals] = useState<MonthlyGoal[]>([]);
   const [activeMonthlyIndex, setActiveMonthlyIndex] = useState(0);
   const [goalMode, setGoalMode] = useState<"yearly" | "monthly">("yearly");
+  const [userName, setUserName] = useState("Guest");
 
   const baseline = useMemo(
     () =>
@@ -152,6 +154,12 @@ const Index = () => {
     const storedGoals = storage.getMonthlyGoals();
     setMonthlyGoals(storedGoals);
   }, []);
+  useEffect(() => {
+    const savedName = localStorage.getItem("user_name_v1");
+    if (savedName) {
+      setUserName(savedName);
+    }
+  }, []);
 
 
   const hasInput = monthlyIncome > 0;
@@ -192,12 +200,10 @@ const Index = () => {
             </h1>
             <div className="absolute right-0 flex gap-2">
               <button
-                onClick={() => {
-                  alert("Sign in is not available in this beta version.");
-                }}
+                onClick={() => setActiveTab("profile")}
                 className="text-xs px-3 py-1 rounded-md border border-border hover:bg-muted transition"
               >
-                Sign in
+                👤
               </button>
               <button
                 onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
@@ -264,13 +270,19 @@ const Index = () => {
     showBaselineForm={showBaselineForm}
     setShowBaselineForm={setShowBaselineForm}
     setActiveTab={setActiveTab}
+    userName={userName}
   />
 ) : activeTab === "simulate" ? (
   <DecisionTab
     baseline={baseline}
     purchases={purchases}
     onLogPurchase={(purchase) => {
-      const updated = [purchase, ...purchases];
+      const newPurchase = {
+        ...purchase,
+        id: crypto.randomUUID(),
+      };
+
+      const updated = [newPurchase, ...purchases];
       setPurchases(updated);
       storage.setPurchases(updated);
     }}
@@ -280,7 +292,20 @@ const Index = () => {
       storage.setPurchases(updated);
     }}
   />
-        ) : (
+) : activeTab === "profile" ? (
+  <ProfileTab
+    monthlyIncome={monthlyIncome}
+    monthlyExpenses={monthlyExpenses}
+    currentSavings={currentSavings}
+    setMonthlyIncome={setMonthlyIncome}
+    setMonthlyExpenses={setMonthlyExpenses}
+    setCurrentSavings={setCurrentSavings}
+    onSaveProfile={(name) => {
+      setUserName(name);
+      setActiveTab("baseline");
+    }}
+  />
+) : (
   <GoalsTab
   goalMode={goalMode}
   setGoalMode={setGoalMode}
@@ -310,6 +335,7 @@ const Index = () => {
         </div>
       </main>
       {/* Bottom Minimal Navigation */}
+      {activeTab !== "profile" && (
       <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50">
         <div className="flex items-center gap-8 px-6 py-3 rounded-full bg-background/70 backdrop-blur-xl shadow-md">
 
@@ -338,6 +364,7 @@ const Index = () => {
 
         </div>
       </div>
+      )}
     </div>
   );
 };

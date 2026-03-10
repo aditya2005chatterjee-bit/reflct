@@ -1,5 +1,3 @@
-
-
 import { LoggedPurchase } from "@/lib/financial";
 
 const BASELINE_STORAGE_KEY = "baseline_v1";
@@ -7,6 +5,7 @@ const PURCHASE_STORAGE_KEY = "purchaseHistory_v1";
 const GOAL_TRACKER_STORAGE_KEY = "goal_tracker_v1";
 const GOAL_CONFIG_STORAGE_KEY = "goal_config_v1";
 const MONTHLY_GOALS_STORAGE_KEY = "monthly_goals_v1";
+const PROFILE_STORAGE_KEY = "profile_v1";
 
 export const storage = {
   getBaseline() {
@@ -59,5 +58,15 @@ export const storage = {
 
   setMonthlyGoals(data: any[]) {
     localStorage.setItem(MONTHLY_GOALS_STORAGE_KEY, JSON.stringify(data));
+  },
+
+  // ===== PROFILE =====
+  getProfile() {
+    const raw = localStorage.getItem(PROFILE_STORAGE_KEY);
+    return raw ? JSON.parse(raw) : { name: "Guest" };
+  },
+
+  setProfile(data: { name: string }) {
+    localStorage.setItem(PROFILE_STORAGE_KEY, JSON.stringify(data));
   },
 };
