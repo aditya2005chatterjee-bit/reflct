@@ -119,14 +119,14 @@ const BaselineTab: React.FC<BaselineTabProps> = ({
       </div>
 
       {/* Stability Ring */}
-      <div className="relative w-28 h-28">
-        <div
-          className="absolute inset-0 rounded-full"
-          style={{
-            background: `conic-gradient(#3b82f6 ${stability.stabilityScore}%, rgba(0,0,0,0.08) ${stability.stabilityScore}%)`,
-          }}
+      <div className="relative w-32 h-32">
+        <ProgressRing
+          value={stability.stabilityScore}
+          size={128}
+          thickness={14}
+          color="#3b82f6"
         />
-        <div className="absolute inset-[10px] bg-background rounded-full flex flex-col items-center justify-center">
+        <div className="absolute inset-[14px] bg-background rounded-full flex flex-col items-center justify-center">
           <span className="text-3xl font-semibold tracking-tight">
             {stability.stabilityScore}
           </span>
