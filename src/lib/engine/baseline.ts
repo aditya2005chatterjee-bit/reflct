@@ -13,11 +13,12 @@ export function computeBaseline(
   currentSavings: number,
   purchases: LoggedPurchase[]
 ): ComputedBaseline {
-  const { totalActiveEMI, oneTimeSpendingThisMonth } =
+  const { totalActiveEMI } =
     computePurchaseImpactForMonth(purchases);
 
+  // Only EMI should affect monthly expenses (cash purchases affect savings, not expenses)
   const adjustedExpenses =
-    monthlyExpenses + totalActiveEMI + oneTimeSpendingThisMonth;
+    monthlyExpenses + totalActiveEMI;
 
   return {
     monthlyIncome,

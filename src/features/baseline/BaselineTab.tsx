@@ -110,9 +110,11 @@ const BaselineTab: React.FC<BaselineTabProps> = ({
         </div>
 
         <div className="flex justify-between text-sm">
-          <span className="text-muted-foreground">Savings Left</span>
+          <span className="text-muted-foreground">Monthly Surplus</span>
           <span className="text-lg font-semibold">
-            {formatCurrency(monthlyIncome - baseline.monthlyExpenses)}
+            {monthlyIncome - baseline.monthlyExpenses >= 0
+              ? formatCurrency(monthlyIncome - baseline.monthlyExpenses)
+              : `-${formatCurrency(Math.abs(monthlyIncome - baseline.monthlyExpenses))}`}
           </span>
         </div>
       </div>

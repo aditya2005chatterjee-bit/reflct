@@ -285,6 +285,10 @@ const Index = () => {
       const updated = [newPurchase, ...purchases];
       setPurchases(updated);
       storage.setPurchases(updated);
+      // Fix: Cash purchases should reduce current savings (not affect monthly expenses)
+      if (!purchase.isEMI) {
+        setCurrentSavings((prev) => Math.max(0, prev - purchase.price));
+      }
     }}
     onDeletePurchase={(id) => {
       const updated = purchases.filter((p) => p.id !== id);
