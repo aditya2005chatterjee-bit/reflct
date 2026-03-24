@@ -1,6 +1,7 @@
 import React from "react";
 import CurrencyInput from "@/components/CurrencyInput";
 import { formatCurrency, LoggedPurchase, MonthlyGoal } from "@/lib/financial";
+import Rings from "@/components/ui/rings";
 
 interface BaselineTabProps {
   stability: any;
@@ -120,20 +121,11 @@ const BaselineTab: React.FC<BaselineTabProps> = ({
       </div>
 
       {/* Stability Ring */}
-      <div className="relative w-28 h-28">
-        <div
-          className="absolute inset-0 rounded-full"
-          style={{
-            background: `conic-gradient(#3b82f6 ${stability.stabilityScore}%, rgba(0,0,0,0.08) ${stability.stabilityScore}%)`,
-          }}
-        />
-        <div className="absolute inset-[10px] bg-background rounded-full flex flex-col items-center justify-center">
-          <span className="text-3xl font-semibold tracking-tight">
-            {stability.stabilityScore}
-          </span>
-          <span className="text-[10px] text-muted-foreground">Overall</span>
-        </div>
-      </div>
+      <Rings
+        data={[
+          { label: "Overall", value: stability.stabilityScore },
+        ]}
+      />
 
       {/* Action Buttons */}
       <button
@@ -201,70 +193,29 @@ const BaselineTab: React.FC<BaselineTabProps> = ({
                 100,
                 (goal.collectedAmount / goal.targetAmount) * 100
               );
-              const ringColor =
-                progress >= 100 ? "#22c55e" :
-                progress >= 70 ? "#3b82f6" :
-                progress >= 40 ? "#f97316" :
-                "#ef4444";
-
               return (
-                <div className="flex flex-col items-center">
-                  <div className="relative w-32 h-32">
-                    <div
-                      className="absolute inset-0 rounded-full"
-                      style={{
-                        background: `conic-gradient(${ringColor} ${progress}%, rgba(255,255,255,0.08) ${progress}%)`,
-                      }}
-                    />
-                    <div className="absolute inset-[14px] bg-background rounded-full flex flex-col items-center justify-center text-center">
-                      <span className="text-3xl font-semibold tracking-tight">
-                        {progress.toFixed(0)}%
-                      </span>
-                      <span className="text-[10px] text-muted-foreground leading-tight">
-                        {goal.name}
-                      </span>
-                    </div>
-                  </div>
-
-                  <div className="flex gap-1 mt-2">
-                    {monthlyGoals.map((_, i) => (
-                      <div
-                        key={i}
-                        className={`h-1.5 w-1.5 rounded-full ${
-                          i === activeMonthlyIndex ? "bg-foreground" : "bg-muted"
-                        }`}
-                      />
-                    ))}
-                  </div>
-                </div>
+                <Rings
+                  data={[
+                    {
+                      label: goal.name,
+                      value: progress,
+                    },
+                  ]}
+                />
               );
             })()
           )}
         </div>
 
         {/* Long Term Goal Ring */}
-        <div className="relative w-32 h-32 flex-shrink-0">
-          <div
-            className="absolute inset-0 rounded-full"
-            style={{
-              background: `conic-gradient(${
-                goalProgressPercent >= 100 ? "#22c55e" :
-                goalProgressPercent >= 70 ? "#3b82f6" :
-                goalProgressPercent >= 40 ? "#f97316" :
-                "#ef4444"
-              } ${goalProgressPercent}%, rgba(255,255,255,0.08) ${goalProgressPercent}%)`,
-            }}
-          />
-
-          <div className="absolute inset-[14px] bg-background rounded-full flex flex-col items-center justify-center text-center">
-            <span className="text-3xl font-semibold tracking-tight">
-              {goalProgressPercent.toFixed(0)}%
-            </span>
-            <span className="text-[10px] text-muted-foreground leading-tight">
-              Long Term Goal
-            </span>
-          </div>
-        </div>
+        <Rings
+          data={[
+            {
+              label: "Long Term Goal",
+              value: goalProgressPercent,
+            },
+          ]}
+        />
       </div>
     </div>
   );

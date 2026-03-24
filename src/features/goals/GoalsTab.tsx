@@ -3,6 +3,7 @@ import React from "react";
 import CurrencyInput from "@/components/CurrencyInput";
 import { MonthlyGoal } from "@/lib/financial";
 import { formatCurrency } from "@/lib/financial";
+import Rings from "@/components/ui/rings";
 
 interface GoalsTabProps {
   goalMode: "yearly" | "monthly";
@@ -208,31 +209,14 @@ const GoalsTab: React.FC<GoalsTabProps> = ({
 
           {/* Wealth Progress Ring */}
           <div className="flex justify-center">
-            <div className="relative w-32 h-32 flex items-center justify-center">
-              {/* Wealth Progress Ring: single orange ring with grey remainder */}
-              <div
-                className="absolute w-32 h-32 rounded-full"
-                style={{
-                  background: `conic-gradient(
-                    ${wealthColor} ${goalProgressPercent}%,
-                    rgba(255,255,255,0.08) ${goalProgressPercent}%
-                  )`,
-                  WebkitMask:
-                    "radial-gradient(circle 48px at center, transparent 98%, black 100%)",
-                  mask:
-                    "radial-gradient(circle 48px at center, transparent 98%, black 100%)",
-                }}
-              />
-              {/* Center Core */}
-              <div className="absolute w-16 h-16 bg-card rounded-full flex flex-col items-center justify-center">
-                <span className="text-xl font-semibold tracking-tight">
-                  {goalProgressPercent.toFixed(0)}%
-                </span>
-                <span className="text-[10px] text-muted-foreground">
-                  Wealth
-                </span>
-              </div>
-            </div>
+            <Rings
+              data={[
+                {
+                  label: "Wealth",
+                  value: goalProgressPercent,
+                },
+              ]}
+            />
           </div>
 
       {/* Analytics Cards */}
@@ -499,20 +483,16 @@ const GoalsTab: React.FC<GoalsTabProps> = ({
                     </p>
                   </div>
 
-                  <div className="relative w-20 h-20 mx-auto">
-
-                    <div
-                      className="absolute inset-0 rounded-full"
-                      style={{
-                        background: `conic-gradient(#3b82f6 ${progress}%, rgba(255,255,255,0.08) ${progress}%)`,
-                      }}
-                    />
-
-                    <div className="absolute inset-[8px] bg-background rounded-full flex items-center justify-center text-xs font-semibold">
-                      {progress.toFixed(0)}%
-                    </div>
-
-                  </div>
+                  <Rings
+                    data={[
+                      {
+                        label: goal.name,
+                        value: progress,
+                      },
+                    ]}
+                    size={80}
+                    strokeWidth={8}
+                  />
 
                   <p className="text-sm text-center text-muted-foreground">
                     {formatCurrency(goal.collectedAmount)} / {formatCurrency(goal.targetAmount)}
