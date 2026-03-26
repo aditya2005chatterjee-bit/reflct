@@ -1,8 +1,5 @@
-
-
 import React from "react";
 import PurchaseSimulator from "@/components/PurchaseSimulator";
-import Rings from "@/components/ui/rings";
 import { LoggedPurchase } from "@/lib/financial";
 
 interface DecisionTabProps {
@@ -31,23 +28,6 @@ const DecisionTab: React.FC<DecisionTabProps> = ({
       </div>
 
       <div className="space-y-8">
-        {/* Simulation Impact Rings */}
-        <Rings
-          data={[
-            {
-              label: "Stability",
-              value: baseline?.stabilityScore || 0,
-            },
-            {
-              label: "Savings",
-              value: baseline?.savingsScore || 0,
-            },
-            {
-              label: "Expenses",
-              value: baseline?.expenseScore || 0,
-            },
-          ]}
-        />
         <PurchaseSimulator
           baseline={baseline}
           purchases={purchases}

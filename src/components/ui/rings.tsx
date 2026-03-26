@@ -26,7 +26,9 @@ const SingleRing: React.FC<{
 }> = ({ value, size, strokeWidth, color, label }) => {
   const radius = (size - strokeWidth) / 2;
   const circumference = 2 * Math.PI * radius;
-  const progress = (value / 100) * 0.85; // only 85% of circle (iOS-style gap)
+  // Allow full completion at 100%, otherwise keep gap style
+  const progress = value >= 100 ? 1 : (value / 100) * 0.85;
+
   const dash = progress * circumference;
   const offset = circumference - dash;
 
